@@ -19,7 +19,7 @@ namespace EMG
         int pizza_2 = 0;
         bool pizza_1_is_active = false;
         bool pizza_2_is_active = false;
-        double[] minV = { 99999999999999, 99999999999999, 99999999999999, 99999999999999, 99999999999999, 99999999999999, 99999999999999, 99999999999999 };
+        double[] minV = { 999999, 999999, 999999, 999999, 999999, 999999, 999999, 999999 };
         double[] maxV = { 0, 0, 0, 0, 0, 0, 0, 0 };
         int[] hand_command = new int[5];
         int[] drone_command = new int[8];
@@ -206,7 +206,7 @@ namespace EMG
                         drone_command[j] = 0;
                 }
                     change_pizza_flag();
-                if (proportional_control_checkBox.Checked)
+                if (!proportional_control_checkBox.Checked)
                     disc_control();
                 else propor_control();
                 }
@@ -227,8 +227,18 @@ namespace EMG
         {
             if (pizza_1_is_active)
             {
-                drone_command[pizza_1] = Convert.ToInt32((100*(Math.Abs(currentAbsValue[0] - trackBars[0].Value)) / (maxV[0] - trackBars[0].Value)));
-                pictureBox14.Visible = true;
+                try
+                {
+                    double tresh = (Convert.ToDouble(trackBars[0].Value) / Convert.ToDouble(trackBars[0].Maximum) * (maxV[0] - minV[0]) + minV[0]);
+                    int speed = Convert.ToInt32(50 * (Math.Abs(currentAbsValue[0] - tresh) / maxV[0]));
+                    drone_command[pizza_1] = speed > 50 ? 50 : speed;
+
+                    pictureBox14.Visible = true;
+                }
+                catch(Exception ex)
+                {
+
+                }
             }
             else
             {
@@ -237,9 +247,18 @@ namespace EMG
             }
             if (pizza_2_is_active)
             {
-                drone_command[pizza_2+4] = Convert.ToInt32(100*(Math.Abs(currentAbsValue[1] - trackBars[1].Value)) / (maxV[1] - trackBars[1].Value));
+                try { 
+                double tresh = (Convert.ToDouble(trackBars[1].Value) / Convert.ToDouble(trackBars[1].Maximum) * (maxV[1] - minV[1]) + minV[1]);
+                
+                 int speed = Convert.ToInt32(50 * (Math.Abs(currentAbsValue[1] - tresh) / maxV[1]));
+                drone_command[pizza_2 + 4] = speed > 50 ? 50 : speed;
                 pictureBox15.Visible = true;
             }
+                catch (Exception ex)
+            {
+
+            }
+        }
             else pictureBox15.Visible = false;
         }
 
@@ -321,8 +340,8 @@ namespace EMG
             else
             {
                 
-                try
-                {
+                //try
+                //{
                     if (drone_radioButton.Checked)
                     {
                         if (pizza_control_checkBox.Checked)
@@ -344,9 +363,16 @@ namespace EMG
                                             maxV[i] = mid;
                                     }
                                     currentDictionary[titles[i*11]].Clear();
+                                try
+                                {
                                     progressBars[i].Minimum = Convert.ToInt32(minV[i]);
                                     progressBars[i].Maximum = Convert.ToInt32(maxV[i]);
                                     progressBars[i].Value = Convert.ToInt32(mid);
+                                }
+                                catch(Exception ex)
+                                {
+
+                                }
                                     control(i);
                                 }
                         }
@@ -460,12 +486,12 @@ namespace EMG
                                 control(i);
                             }
                     }
-                }
-                catch(Exception ex)
-                {
-                    timer1.Stop();
-                    MessageBox.Show("Необходим сигнал", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);                  
-                }
+                //}
+                //catch(Exception ex)
+                //{
+                //    timer1.Stop();
+                //    MessageBox.Show("Необходим сигнал", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);                  
+                //}
 
             }
         }
@@ -762,6 +788,7 @@ namespace EMG
             groupBox5.Visible = false;
             drone_groupBox.Visible = true;
             hand_groupBox.Visible = false;
+            channels_groupBox.Visible = false;
         }
 
         private void hand_radioButton_CheckedChanged(object sender, EventArgs e)
@@ -772,6 +799,7 @@ namespace EMG
             groupBox5.Visible = false;
             drone_groupBox.Visible = false;
             hand_groupBox.Visible = true;
+            channels_groupBox.Visible = false;
         }
 
         private void bpla_radioButton_CheckedChanged(object sender, EventArgs e)
@@ -783,11 +811,23 @@ namespace EMG
             groupBox5.Visible = true;
             drone_groupBox.Visible = true;
             hand_groupBox.Visible = false;
+            channels_groupBox.Visible = false;
         }
 
         private void trackBar2_Scroll(object sender, EventArgs e)
         {
 
+        }
+
+        private void radioButton1_CheckedChanged_1(object sender, EventArgs e)
+        {
+            groupBox1.Visible = false;
+            groupBox3.Visible = false;
+            groupBox4.Visible = false;
+            groupBox5.Visible = false;
+            drone_groupBox.Visible = false;
+            hand_groupBox.Visible = false;
+            channels_groupBox.Visible = true;
         }
     }
 }
