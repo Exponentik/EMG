@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-
+using System.Linq;
 using System.Windows.Forms;
 using NetManager;
 
@@ -36,6 +36,7 @@ namespace EMG
         TrackBar[] trackBars;
         bool tresholdFlag = false;
         bool timerFlag = false;
+        List<List<int>> smoothList;
         double[] currentAbsValue = new double[29];
         Dictionary<String, List<double>> meanDictionary = new Dictionary<String, List<double>>();
         Dictionary<String, List<double>> currentDictionary = new Dictionary<String, List<double>>();
@@ -61,6 +62,11 @@ namespace EMG
             pictureBoxes_bpla_pizza_2 = new PictureBox[] { bpla_pizza_2_1, bpla_pizza_2_2 };
             progressBars = new ProgressBar[] { progressBar3, progressBar2 };
             trackBars = new TrackBar[] { trackBar2, trackBar1 };
+            smoothList = new List<List<int>>();
+            for(int i = 0; i<8; i++)
+            {
+                smoothList.Add(new List<int>());
+            }
 
         }
 
@@ -230,8 +236,9 @@ namespace EMG
                 try
                 {
                     double tresh = (Convert.ToDouble(trackBars[0].Value) / Convert.ToDouble(trackBars[0].Maximum) * (maxV[0] - minV[0]) + minV[0]);
-                    int speed = Convert.ToInt32(50 * (Math.Abs(currentAbsValue[0] - tresh) / maxV[0]));
-                    drone_command[pizza_1] = speed > 50 ? 50 : speed;
+                    int speed = Convert.ToInt32(100 * (Math.Abs(currentAbsValue[0] - tresh) / maxV[0]));
+                    drone_command[pizza_1] = speed > 100 ? 100 : speed;
+
 
                     pictureBox14.Visible = true;
                 }
@@ -248,10 +255,9 @@ namespace EMG
             if (pizza_2_is_active)
             {
                 try { 
-                double tresh = (Convert.ToDouble(trackBars[1].Value) / Convert.ToDouble(trackBars[1].Maximum) * (maxV[1] - minV[1]) + minV[1]);
-                
-                 int speed = Convert.ToInt32(50 * (Math.Abs(currentAbsValue[1] - tresh) / maxV[1]));
-                drone_command[pizza_2 + 4] = speed > 50 ? 50 : speed;
+                double tresh = (Convert.ToDouble(trackBars[1].Value) / Convert.ToDouble(trackBars[1].Maximum) * (maxV[1] - minV[1]) + minV[1]);    
+                int speed = Convert.ToInt32(100 * (Math.Abs(currentAbsValue[1] - tresh) / maxV[1]));
+                drone_command[pizza_2 + 4] = speed > 100 ? 100 : speed;
                 pictureBox15.Visible = true;
             }
                 catch (Exception ex)
@@ -547,11 +553,30 @@ namespace EMG
 
                 if (drone_radioButton.Checked)
                 {
+                    if (smoothList[0].Count < 1)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            smoothList[i].Add(drone_command[i]);
+                        }
+                    }
+                    else
+                    {
+
+                        for (int i = 0; i < 8; i++)
+                        {
+                            drone_command[i] =(Convert.ToInt32(smoothList[i].Sum(x => x)) + drone_command[i] )/ 2;
+                            smoothList[i].Add(drone_command[i]);
+                            smoothList[i].RemoveAt(0);
+                        }
+                    }
                     byte[] result = new byte[drone_command.Length * sizeof(int)];
 
                     Buffer.BlockCopy(drone_command, 0, result, 0, result.Length);
-
+                    
                     clientControl1.Client.SendData(clientControl1.CheckedClientAddresses[0], result);
+
+
 
                 }
                 else if (bpla_radioButton.Checked)
@@ -576,12 +601,14 @@ namespace EMG
             catch (Exception ex) {
                 timer3.Stop();
                 MessageBox.Show("Сперва запустите управление", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                button_stop.Enabled = false;
             }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             timer3.Start();
+            button_stop.Enabled = true;
         }
 
         private void reseiveClientControl1_ReseiveData(object sender, EventClientMsgArgs e)
@@ -639,6 +666,7 @@ namespace EMG
                 }
             }
             tresholdFlag = !tresholdFlag;
+            Calibration_label.Visible = !Calibration_label.Visible;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -828,6 +856,12 @@ namespace EMG
             drone_groupBox.Visible = false;
             hand_groupBox.Visible = false;
             channels_groupBox.Visible = true;
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            timer3.Stop();
+            button_stop.Enabled = false;
         }
     }
 }

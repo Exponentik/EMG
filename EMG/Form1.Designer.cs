@@ -156,6 +156,8 @@
             this.label24 = new System.Windows.Forms.Label();
             this.channels_groupBox = new System.Windows.Forms.GroupBox();
             this.chanels_radioButton = new System.Windows.Forms.RadioButton();
+            this.Calibration_label = new System.Windows.Forms.Label();
+            this.button_stop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarUp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
@@ -1651,12 +1653,35 @@
             this.chanels_radioButton.UseVisualStyleBackColor = true;
             this.chanels_radioButton.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged_1);
             // 
+            // Calibration_label
+            // 
+            this.Calibration_label.AutoSize = true;
+            this.Calibration_label.Location = new System.Drawing.Point(32, 967);
+            this.Calibration_label.Name = "Calibration_label";
+            this.Calibration_label.Size = new System.Drawing.Size(195, 17);
+            this.Calibration_label.TabIndex = 138;
+            this.Calibration_label.Text = "Производится калибровка...";
+            this.Calibration_label.Visible = false;
+            // 
+            // button_stop
+            // 
+            this.button_stop.Enabled = false;
+            this.button_stop.Location = new System.Drawing.Point(215, 834);
+            this.button_stop.Name = "button_stop";
+            this.button_stop.Size = new System.Drawing.Size(75, 23);
+            this.button_stop.TabIndex = 139;
+            this.button_stop.Text = "Стоп";
+            this.button_stop.UseVisualStyleBackColor = true;
+            this.button_stop.Click += new System.EventHandler(this.button1_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1924, 1055);
+            this.Controls.Add(this.button_stop);
+            this.Controls.Add(this.Calibration_label);
             this.Controls.Add(this.chanels_radioButton);
             this.Controls.Add(this.channels_groupBox);
             this.Controls.Add(this.label24);
@@ -1881,6 +1906,8 @@
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.RadioButton chanels_radioButton;
         private System.Windows.Forms.GroupBox channels_groupBox;
+        private System.Windows.Forms.Label Calibration_label;
+        private System.Windows.Forms.Button button_stop;
     }
 }
 

@@ -66,6 +66,10 @@ namespace EMG
                     outputArray[i] = windowSum / windowSize;
                 }
             }
+            finally
+            {
+
+            }
             return outputArray;
         }
         public static double[] calculate_abs(double[] X, int window_size, int delay)
