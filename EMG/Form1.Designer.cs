@@ -260,7 +260,7 @@
             // 
             // timer2
             // 
-            this.timer2.Interval = 1000;
+            this.timer2.Interval = 2000;
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
             // label1
@@ -684,7 +684,7 @@
             // 
             // timer5
             // 
-            this.timer5.Interval = 1000;
+            this.timer5.Interval = 2000;
             this.timer5.Tick += new System.EventHandler(this.timer5_Tick);
             // 
             // pizza_control_checkBox
