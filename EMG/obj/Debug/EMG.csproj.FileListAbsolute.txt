@@ -144,3 +144,15 @@ C:\Users\ghost\OneDrive\Рабочий стол\EMG\EMG\obj\Debug\EMG.csproj.Cor
 C:\Users\ghost\OneDrive\Рабочий стол\EMG\EMG\obj\Debug\EMG.csproj.CopyComplete
 C:\Users\ghost\OneDrive\Рабочий стол\EMG\EMG\obj\Debug\EMG.exe
 C:\Users\ghost\OneDrive\Рабочий стол\EMG\EMG\obj\Debug\EMG.pdb
+C:\Users\user\Documents\EMG\EMG\bin\Debug\EMG.exe.config
+C:\Users\user\Documents\EMG\EMG\bin\Debug\EMG.exe
+C:\Users\user\Documents\EMG\EMG\bin\Debug\EMG.pdb
+C:\Users\user\Documents\EMG\EMG\bin\Debug\FoundationLibrary.dll
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.csproj.AssemblyReference.cache
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.Form1.resources
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.Properties.Resources.resources
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.csproj.GenerateResource.cache
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.csproj.Up2Date
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.exe
+C:\Users\user\Documents\EMG\EMG\obj\Debug\EMG.pdb

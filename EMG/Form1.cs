@@ -31,6 +31,8 @@ namespace EMG
         PictureBox[] pictureBoxes_pizza_2;
         PictureBox[] pictureBoxes_bpla_pizza_1;
         PictureBox[] pictureBoxes_bpla_pizza_2;
+        Label[] right_drone_pizza_labels;
+        Label[] left_drone_pizza_labels;
         CheckBox[] checkBoxes_drone;
         ProgressBar[] progressBars;
         TrackBar[] trackBars;
@@ -40,6 +42,9 @@ namespace EMG
         double[] currentAbsValue = new double[29];
         Dictionary<String, List<double>> meanDictionary = new Dictionary<String, List<double>>();
         Dictionary<String, List<double>> currentDictionary = new Dictionary<String, List<double>>();
+        int selected_scheme_index = 1;
+        List<Slice>  left_pizza;
+        List<Slice> right_pizza;
 
         public Form1()
         {
@@ -50,24 +55,33 @@ namespace EMG
                 hand_command[i] = 0;
             
             InitializeComponent();
+
             pictureBoxes_touch = new PictureBox[] {pictureBoxtl, pictureBoxtm, pictureBoxtr, pictureBoxml, pictureBoxc, pictureBoxmr, pictureBoxll,
             pictureBoxlm, pictureBoxlr, pictureBoxtp, pictureBoxmp, pictureBoxlp, pictureBoxrt, pictureBoxrm, pictureBoxrl, pictureBoxum,
             pictureBoxmm, pictureBoxlfm, pictureBoxti, pictureBoxmi, pictureBoxli, pictureBoxtt, pictureBoxlt};
             pictureBoxes_finger = new PictureBox[] { pictureBox1, pictureBox2, pictureBox3, pictureBox4, pictureBox5 };
             pictureBoxes_drone = new PictureBox[] { pictureBox6, pictureBox7, pictureBox8, pictureBox9, pictureBox10, pictureBox11, pictureBox12, pictureBox13 };
             checkBoxes_drone = new CheckBox[] { checkBox2, checkBox3, checkBox4, checkBox5, checkBox6, checkBox7, checkBox8, checkBox9};
-            pictureBoxes_pizza_1 = new PictureBox[] { pizza_1_1, pizza_1_2, pizza_1_3, pizza_1_4 };
-            pictureBoxes_pizza_2 = new PictureBox[] { pizza_2_1, pizza_2_2, pizza_2_3, pizza_2_4 };
+            pictureBoxes_pizza_1 = new PictureBox[] { pizza_1_4, pizza_1_1, pizza_1_2, pizza_1_3 };
+            pictureBoxes_pizza_2 = new PictureBox[] { pizza_2_4, pizza_2_1, pizza_2_2, pizza_2_3 };
             pictureBoxes_bpla_pizza_1 = new PictureBox[] { bpla_pizza_1_1, bpla_pizza_1_2 };
             pictureBoxes_bpla_pizza_2 = new PictureBox[] { bpla_pizza_2_1, bpla_pizza_2_2 };
             progressBars = new ProgressBar[] { progressBar3, progressBar2 };
             trackBars = new TrackBar[] { trackBar2, trackBar1 };
+            right_drone_pizza_labels = new Label[] { right_pizza_up, right_pizza_right, right_pizza_down, right_pizza_left };
+            left_drone_pizza_labels = new Label[] { left_pizza_up, left_pizza_right, left_pizza_down, left_pizza_left };
             smoothList = new List<List<int>>();
             for(int i = 0; i<8; i++)
             {
                 smoothList.Add(new List<int>());
             }
-
+            left_pizza = Pizza_selecter_left.pizza_dictionary[1];
+            right_pizza = Pizza_selecter_right.pizza_dictionary[1];
+            for (int j = 0; j < 4; j++)
+            {
+                left_drone_pizza_labels[j].Text = left_pizza[j].type.ToString();
+                right_drone_pizza_labels[j].Text = right_pizza[j].type.ToString();
+            }
         }
 
 
@@ -118,7 +132,6 @@ namespace EMG
             {
                 control_start_button.Invoke(new Action(() =>
                 {
-                    // Код для обновления элемента управления
                     control_start_button.Enabled = true;
                 }));
             }
@@ -237,7 +250,7 @@ namespace EMG
                 {
                     double tresh = (Convert.ToDouble(trackBars[0].Value) / Convert.ToDouble(trackBars[0].Maximum) * (maxV[0] - minV[0]) + minV[0]);
                     int speed = Convert.ToInt32(100 * (Math.Abs(currentAbsValue[0] - tresh) / maxV[0]));
-                    drone_command[pizza_1] = speed > 100 ? 100 : speed;
+                    drone_command[((int)left_pizza[pizza_1].type)] = speed > 100 ? 100 : speed;
 
 
                     pictureBox14.Visible = true;
@@ -257,7 +270,7 @@ namespace EMG
                 try { 
                 double tresh = (Convert.ToDouble(trackBars[1].Value) / Convert.ToDouble(trackBars[1].Maximum) * (maxV[1] - minV[1]) + minV[1]);    
                 int speed = Convert.ToInt32(100 * (Math.Abs(currentAbsValue[1] - tresh) / maxV[1]));
-                drone_command[pizza_2 + 4] = speed > 100 ? 100 : speed;
+                drone_command[((int)right_pizza[pizza_2].type)] = speed > 100 ? 100 : speed;
                 pictureBox15.Visible = true;
             }
                 catch (Exception ex)
@@ -272,7 +285,7 @@ namespace EMG
         {
             if (pizza_1_is_active)
             {
-                drone_command[pizza_1] = 1;
+                drone_command[((int)left_pizza[pizza_1].type)] = 1;
                 pictureBox14.Visible = true;
             }
             else
@@ -282,7 +295,7 @@ namespace EMG
             }
             if (pizza_2_is_active)
             {
-                drone_command[pizza_2 + 4] = 1;
+                drone_command[((int)right_pizza[pizza_2].type)] = 1;
                 pictureBox15.Visible = true;
             }
             else pictureBox15.Visible = false;
@@ -355,6 +368,10 @@ namespace EMG
                             for (int i = 0; i < 2; i++)
                                 if (meanDictionary[titles[i*11]].Count == currentDictionary[titles[i*11]].Count)
                                 {
+                                    int analize_w = (pizza_1_is_active&&(i == 0)) ? analise_window / 20 : analise_window / 10;
+
+                                    analize_w = (pizza_2_is_active && (i == 1)) ? analise_window / 20 : analise_window / 10;
+
                                     var array = Abs_value.calculate_abs(currentDictionary[titles[i*11]].ToArray(), analise_window / 10, dec);
                                     double summ = 0;
                                     for (int j = 0; j < array.Length; j++)
@@ -553,21 +570,24 @@ namespace EMG
 
                 if (drone_radioButton.Checked)
                 {
-                    if (smoothList[0].Count < 1)
+                    if (proportional_control_checkBox.Checked)
                     {
-                        for (int i = 0; i < 8; i++)
+                        if (smoothList[0].Count < 1)
                         {
-                            smoothList[i].Add(drone_command[i]);
+                            for (int i = 0; i < 8; i++)
+                            {
+                                smoothList[i].Add(drone_command[i]);
+                            }
                         }
-                    }
-                    else
-                    {
-
-                        for (int i = 0; i < 8; i++)
+                        else
                         {
-                            drone_command[i] =(Convert.ToInt32(smoothList[i].Sum(x => x)) + drone_command[i] )/ 2;
-                            smoothList[i].Add(drone_command[i]);
-                            smoothList[i].RemoveAt(0);
+
+                            for (int i = 0; i < 8; i++)
+                            {
+                                drone_command[i] = (Convert.ToInt32(smoothList[i].Sum(x => x)) + drone_command[i]) / 2;
+                                smoothList[i].Add(drone_command[i]);
+                                smoothList[i].RemoveAt(0);
+                            }
                         }
                     }
                     byte[] result = new byte[drone_command.Length * sizeof(int)];
@@ -649,10 +669,6 @@ namespace EMG
             {
                 trackBarUp.Value = trackBarDown.Value;
             }
-        }
-
-        private void clientControl1_Load(object sender, EventArgs e)
-        {
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -791,7 +807,16 @@ namespace EMG
         }
 
 
-
+        private void visible_Changing(bool[] visible_arr)
+        {
+            groupBox1.Visible = visible_arr[0];
+            groupBox3.Visible = visible_arr[1];
+            groupBox4.Visible = visible_arr[2];
+            groupBox5.Visible = visible_arr[3];
+            drone_groupBox.Visible = visible_arr[4];
+            hand_groupBox.Visible = visible_arr[5];
+            channels_groupBox.Visible = visible_arr[6];
+        }
         private void pictureBox18_Click(object sender, EventArgs e)
         {
 
@@ -809,37 +834,48 @@ namespace EMG
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-
-            groupBox1.Visible = true;
-            groupBox3.Visible = true;
-            groupBox4.Visible = false;
-            groupBox5.Visible = false;
-            drone_groupBox.Visible = true;
-            hand_groupBox.Visible = false;
-            channels_groupBox.Visible = false;
+            bool[] visibilityArray = new bool[]
+{
+    true,   // groupBox1 видим
+    true,  // groupBox3 скрыт
+    false,   // groupBox4 видим
+    false,  // groupBox5 скрыт
+    true,   // drone_groupBox видим
+    false,   // hand_groupBox видим
+    false   // channels_groupBox скрыт
+};
+            visible_Changing(visibilityArray);
         }
 
         private void hand_radioButton_CheckedChanged(object sender, EventArgs e)
         {
-            groupBox1.Visible = false;
-            groupBox3.Visible = false;
-            groupBox4.Visible = false;
-            groupBox5.Visible = false;
-            drone_groupBox.Visible = false;
-            hand_groupBox.Visible = true;
-            channels_groupBox.Visible = false;
+            bool[] visibilityArray = new bool[]
+{
+    false,   // groupBox1 видим
+    false,  // groupBox3 скрыт
+    false,   // groupBox4 видим
+    false,  // groupBox5 скрыт
+    false,   // drone_groupBox видим
+    true,   // hand_groupBox видим
+    false   // channels_groupBox скрыт
+};
+            visible_Changing(visibilityArray);
+
         }
 
         private void bpla_radioButton_CheckedChanged(object sender, EventArgs e)
         {
-
-            groupBox1.Visible = false;
-            groupBox3.Visible = false;
-            groupBox4.Visible = true;
-            groupBox5.Visible = true;
-            drone_groupBox.Visible = true;
-            hand_groupBox.Visible = false;
-            channels_groupBox.Visible = false;
+            bool[] visibilityArray = new bool[]
+{
+    false,   // groupBox1 видим
+    false,  // groupBox3 скрыт
+    true,   // groupBox4 видим
+    true,  // groupBox5 скрыт
+    true,   // drone_groupBox видим
+    false,   // hand_groupBox видим
+    false   // channels_groupBox скрыт
+};
+            visible_Changing(visibilityArray);
         }
 
         private void trackBar2_Scroll(object sender, EventArgs e)
@@ -849,19 +885,43 @@ namespace EMG
 
         private void radioButton1_CheckedChanged_1(object sender, EventArgs e)
         {
-            groupBox1.Visible = false;
-            groupBox3.Visible = false;
-            groupBox4.Visible = false;
-            groupBox5.Visible = false;
-            drone_groupBox.Visible = false;
-            hand_groupBox.Visible = false;
-            channels_groupBox.Visible = true;
+            bool[] visibilityArray = new bool[]
+{
+    false,   // groupBox1 видим
+    false,  // groupBox3 скрыт
+    false,   // groupBox4 видим
+    false,  // groupBox5 скрыт
+    false,   // drone_groupBox видим
+    false,   // hand_groupBox видим
+    true   // channels_groupBox скрыт
+};
+            visible_Changing(visibilityArray);
         }
 
         private void button1_Click_1(object sender, EventArgs e)
         {
             timer3.Stop();
             button_stop.Enabled = false;
+        }
+
+        private void scheme_1_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            scheme_label_changing(1);
+        }
+
+        private void scheme_2_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            scheme_label_changing(2);
+        }
+        private void scheme_label_changing(int i)
+        {
+            left_pizza = Pizza_selecter_left.pizza_dictionary[i];
+            right_pizza = Pizza_selecter_right.pizza_dictionary[i];
+            for (int j = 0; j < 4; j++)
+            {
+                left_drone_pizza_labels[j].Text = left_pizza[j].type.ToString();
+                right_drone_pizza_labels[j].Text = right_pizza[j].type.ToString();
+            }
         }
     }
 }
